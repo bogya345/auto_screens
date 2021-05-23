@@ -15,8 +15,6 @@ import multiprocessing
 # own imports
 from counter import Counter
 import recognizing as recog
-from threadsClasses import myThread
-from myLogging import logMsgs
 
 # while True:
 
@@ -33,10 +31,9 @@ from myLogging import logMsgs
 #     pass
 
 
-def random_part(name, time_limit):
+def random_part(time_limit, name):
 
-    count_token = Counter.get_new_token('screens/randomly')
-    local_counter = 0
+    # count_token = Counter.get_new_token('screens/randomly')
 
     total, scale = folderSize('screens/randomly')
     #total = size_[0]
@@ -62,14 +59,8 @@ def random_part(name, time_limit):
             filename = 'screens/randomly/{0}={1}.png'.format(
                 name, datetime.datetime.now().strftime('%m%d%Y,%H-%M-%S'))
             image.save(filename)
-            # filename2 = 'screens/test_randomly/{0}={1}.png'.format(
-            #     name, datetime.datetime.now().strftime('%m%d%Y,%H-%M-%S'))
-            # image.save(filename2)
             print('_LUCKYBOY_ : {0}'.format(filename))
-            logMsgs('1','_LUCKYBOY_ : {0}'.format(filename))
-            Counter.inc(count_token, filename)
-            local_counter += 1
-            print('RANDOM:{0}'.format(local_counter))
+            # Counter.inc(count_token, filename)
         else:
             pass
         time.sleep(1)
@@ -79,8 +70,7 @@ def random_part(name, time_limit):
 
 def press_part(name):
 
-    count_token = Counter.get_new_token('screens/pressed')
-    local_counter = 0
+    # count_token = Counter.get_new_token('screens/pressed')
 
     total, scale = folderSize('screens/pressed')
     #total = size_[0]
@@ -93,7 +83,7 @@ def press_part(name):
     last_time = datetime.datetime.now()
 
     while True:
-        if keyboard.is_pressed('i') or keyboard.is_pressed('o') or keyboard.is_pressed('p'):
+        if keyboard.is_pressed('q') or keyboard.is_pressed('i') or keyboard.is_pressed('o'):
 
             if last_time + datetime.timedelta(seconds=1) > datetime.datetime.now():
                 print('_PRESSED_ : Skipped once because of time')
@@ -105,14 +95,8 @@ def press_part(name):
             filename = 'screens/pressed/{0}={1}.png'.format(
                 name, datetime.datetime.now().strftime('%m%d%Y,%H-%M-%S'))
             image.save(filename)
-            # filename2 = 'screens/test_pressed/{0}={1}.png'.format(
-            #     name, datetime.datetime.now().strftime('%m%d%Y,%H-%M-%S'))
-            # image.save(filename2)
             print('_PRESSED_ : {0}'.format(filename))
-            logMsgs('1','_PRESSED_ : {0}'.format(filename))
-            Counter.inc(count_token, filename)
-            local_counter += 1
-            print('PRESS:{0}'.format(local_counter))
+            # Counter.inc(count_token, filename)
         else:
             pass
 
@@ -129,8 +113,7 @@ def press_part(name):
 
 def period_part(name, period):
 
-    count_token = Counter.get_new_token('screens/period')
-    local_counter = 0
+    # count_token = Counter.get_new_token('screens/pressed')
 
     total, scale = folderSize('screens/period')
     #total = size_[0]
@@ -146,25 +129,13 @@ def period_part(name, period):
         filename = 'screens/period/{0}={1}.png'.format(
             name, datetime.datetime.now().strftime('%m%d%Y,%H-%M-%S'))
         image.save(filename)
-        # filename2 = 'screens/test_period/{0}={1}.png'.format(
-        #     name, datetime.datetime.now().strftime('%m%d%Y,%H-%M-%S'))
-        # image.save(filename2)
         print('_PERIOD_ : {0}'.format(filename))
-        logMsgs('1','_PERIOD_ : {0}'.format(filename))
-        Counter.inc(count_token, filename)
-        local_counter += 1
-        print('PERIOD:{0}'.format(local_counter))
+        # Counter.inc(count_token, filename)
+
         pass
 
     pass
 
-def init_counter(text):
-    # return Counter.
-    pass
-
-def counter(token, item):
-    Counter.inc(token, item)
-    pass
 
 def delete_equals_pics(name, period=5):
 
@@ -173,7 +144,7 @@ def delete_equals_pics(name, period=5):
     # for index, (i, j) in zip(range(0, len(Counter.values)), Counter.values):
     #     print('#{0} = {1}'.format(index, i))
     #     continue
-    print('{0}'.format('='*50))
+    print('{0}'.format('='*20))
 
     while (True):
 
@@ -181,10 +152,10 @@ def delete_equals_pics(name, period=5):
 
         # flag = [0] * (len(Counter.values))
         # indexer = 0
-        for key, value in Counter.values.items():
+        for key, value in Counter.values:
             # key == token
             # value == array of filenames
-            if (len(value) > 1):
+            if (value > 0):
                 Counter.pause_counting(key)
                 recog.main1(key)
                 Counter.clear(key)
@@ -299,109 +270,47 @@ if __name__ == '__main__':
 
     print('Start')
 
-    name, period, mins, time_limit = asking()
-    # name, period, mins, time_limit = skip_asking()
-
-    search_period = 2
+    # name, period, mins, time_limit = asking()
+    name, period, mins, time_limit = skip_asking()
 
     print('Name is {0} \t Period is {1} \t Minutes is {2}'.format(
         name, period, mins))
 
-    random_func = random_part
-    press_func = press_part
-    period_func = period_part
-    del_func = delete_equals_pics
+    t_rand = multiprocessing.Process(
+        target=random_part, args=(time_limit, name,))
+    t_rand.start()
 
+    t_press = multiprocessing.Process(target=press_part, args=(name,))
+    t_press.daemon = True
+    t_press.start()
 
-    thread_random = myThread('random_part', random_func, f'rand-{name}', time_limit=time_limit)
-    thread_random.daemon = True
+    t_period = multiprocessing.Process(
+        target=period_part, args=(name, period,))
+    t_period.daemon = True
+    t_period.start()
 
-    thread_press = myThread('press_part', press_func, f'press-{name}')
-    thread_press.daemon = True
-
-    thread_period = myThread('period_part', period_func, f'period-{name}', period=period)
-    thread_period.daemon = True
-
-    #thread_del = myThread('delete_equals_pics', del_func, 'delete_equals_pics', period=search_period)
-    #thread_del.daemon = True
-
-
-    thread_press.start()
-    thread_random.start()
-    thread_period.start()
-    #thread_del.start()
 
     print('All threads are queued.')
     print('Process will be closed at {0} + 1 sec.'.format(time_limit))
 
     while True:
-        if not thread_random.is_alive():
+        if not t_rand.is_alive():
 
-            # thread_press.exit()
-            # thread_random.exit()
-            # thread_del.exit()
-            # thread_random.exit()
+            t_press.terminate()
+            t_press.join()
+            t_press.close()
 
-            thread_press.stop()
-            thread_period.stop()
-            thread_random.stop()
-            #thread_del.stop()
+            t_period.terminate()
+            t_period.join()
+            t_period.close()
 
-            if (thread_random.is_alive()):
-                pass
+            t_rand.close()
 
             print('All processes are closed')
             break
             pass
         time.sleep(1)
         pass
-
-    # # multi proccesing
-    # t_rand = multiprocessing.Process(
-    #     target=random_part, args=(time_limit, name,))
-    # t_rand.start()
-
-    # t_press = multiprocessing.Process(target=press_part, args=(name,))
-    # t_press.daemon = True
-    # t_press.start()
-
-    # t_period = multiprocessing.Process(
-    #     target=period_part, args=(name, period,))
-    # t_period.daemon = True
-    # t_period.start()
-
-    # search_period = 2
-    # t_delete_equals_pics = multiprocessing.Process(
-    #     target=delete_equals_pics, args=(name, search_period,)
-    # )
-    # t_delete_equals_pics.daemon = True
-    # t_delete_equals_pics.start()
-
-    # print('All threads are queued.')
-    # print('Process will be closed at {0} + 1 sec.'.format(time_limit))
-
-    # while True:
-    #     if not t_rand.is_alive():
-
-    #         t_press.terminate()
-    #         t_press.join()
-    #         t_press.close()
-
-    #         t_period.terminate()
-    #         t_period.join()
-    #         t_period.close()
-
-    #         t_delete_equals_pics.terminate()
-    #         t_delete_equals_pics.join()
-    #         t_delete_equals_pics.close()
-
-    #         t_rand.close()
-
-    #         print('All processes are closed')
-    #         break
-    #         pass
-    #     time.sleep(1)
-    #     pass
 
     print('================STATUS================')
 
