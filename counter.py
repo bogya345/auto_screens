@@ -48,7 +48,7 @@ class Counter(object):
             cls.accom[token].append(value)
             print('Accom to ({0}) values'.format(token))
             pass
-        print(cls.values)
+        print(cls.values[token])
         pass
 
     @classmethod
