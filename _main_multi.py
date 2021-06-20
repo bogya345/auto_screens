@@ -59,7 +59,7 @@ def random_part(name, time_limit):
             image = ImageGrab.grab()
             last_time = datetime.datetime.now()
             filename = 'screens/randomly/{0}={1}.png'.format(
-                name, datetime.datetime.now().strftime('%m%d%Y,%H-%M-%S'))
+                datetime.datetime.now().strftime('%m%d%Y,%H-%M-%S'), name)
             image.save(filename)
             # filename2 = 'screens/test_randomly/{0}={1}.png'.format(
             #     name, datetime.datetime.now().strftime('%m%d%Y,%H-%M-%S'))
@@ -102,7 +102,7 @@ def press_part(name):
             image = ImageGrab.grab()
             last_time = datetime.datetime.now()
             filename = 'screens/pressed/{0}={1}.png'.format(
-                name, datetime.datetime.now().strftime('%m%d%Y,%H-%M-%S'))
+                datetime.datetime.now().strftime('%m%d%Y,%H-%M-%S'), name)
             image.save(filename)
             # filename2 = 'screens/test_pressed/{0}={1}.png'.format(
             #     name, datetime.datetime.now().strftime('%m%d%Y,%H-%M-%S'))
@@ -119,7 +119,7 @@ def press_part(name):
 
         if ind == 3000:
             ind = 0
-            time.sleep(1)
+            time.sleep(0.5)
             pass
         pass
 
@@ -143,7 +143,7 @@ def period_part(name, period):
 
         image = ImageGrab.grab()
         filename = 'screens/period/{0}={1}.png'.format(
-            name, datetime.datetime.now().strftime('%m%d%Y,%H-%M-%S'))
+            datetime.datetime.now().strftime('%m%d%Y,%H-%M-%S'), name)
         image.save(filename)
         # filename2 = 'screens/test_period/{0}={1}.png'.format(
         #     name, datetime.datetime.now().strftime('%m%d%Y,%H-%M-%S'))
